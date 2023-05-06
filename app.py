@@ -1,5 +1,6 @@
 import os
-
+from pdf2image import convert_from_bytes
+from PIL import Image
 import streamlit as st
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
@@ -20,6 +21,10 @@ def main():
 
     # extract the text
     if pdf is not None:
+        # Convert the PDF to images
+        pdf_images = convert_from_bytes(pdf.read())
+
+
         pdf_reader = PdfReader(pdf)
         text = ""
         for page in pdf_reader.pages:
@@ -47,10 +52,12 @@ def main():
             chain = load_qa_chain(llm, chain_type="stuff")
             with get_openai_callback() as cb:
                 response = chain.run(input_documents=docs, question=user_question)
-                print(cb)
 
             st.write(response)
 
-
+        # Display each page of the PDF as an image
+        for page_number, image in enumerate(pdf_images, start=1):
+            st.image(image, caption=f"Page {page_number}", use_column_width=True)
+            st.write("")
 if __name__ == '__main__':
     main()
