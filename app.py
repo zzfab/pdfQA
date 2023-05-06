@@ -52,7 +52,7 @@ def main():
             chain = load_qa_chain(llm, chain_type="stuff")
             with get_openai_callback() as cb:
                 response = chain.run(input_documents=docs, question=user_question)
-
+                print(cb)
             st.write(response)
 
         # Display each page of the PDF as an image
